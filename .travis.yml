@@ -1,4 +1,5 @@
-sudo: required
-language: node_js
-node_js:
-  - "10"
+﻿language: csharp
+mono: none
+dotnet: 2.1.502
+script:
+ - dotnet build
