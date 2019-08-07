@@ -22,8 +22,8 @@ The service is responsible for providing Kentico Cloud's API reference in the Op
 
 ### Prerequisites
 
-1. Visual Studio 2017 with Azure Functions and Web Jobs Tools installed
-2. Subscriptions on MS Azure
+1. Visual Studio 2019 with Azure Functions and Web Jobs Tools installed.
+2. Subscription on MS Azure.
 
 ### Instructions
 
