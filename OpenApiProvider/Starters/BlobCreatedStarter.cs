@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using OpenApiProvider.Constants;
-using OpenApiProvider.Models;
 
 namespace OpenApiProvider.Starters
 {
@@ -17,8 +16,8 @@ namespace OpenApiProvider.Starters
             [OrchestrationClient] DurableOrchestrationClient starter,
             ILogger log)
         {
-            var eventGridData = (BlobCreatedData) eventGridEvent.Data;
-            var blobUrl = eventGridData.Url;
+            var eventGridData = (dynamic) eventGridEvent.Data;
+            var blobUrl = (string)eventGridData.url;
             var instanceId = blobUrl
                 .Split("/")
                 .Last();

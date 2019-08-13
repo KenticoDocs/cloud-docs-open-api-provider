@@ -3,7 +3,7 @@ mono: none
 dotnet: 2.1.502
 jobs:
   include:
-    - stage: "Build"
+    - stage: "build"
 
       script:
         - dotnet build

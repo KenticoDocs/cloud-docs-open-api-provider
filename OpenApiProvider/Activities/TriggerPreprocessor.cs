@@ -18,14 +18,11 @@ namespace OpenApiProvider.Activities
                 EnvironmentVariables.EventGridReferenceRequestedKey
             );
 
-            if (input.Codename.Contains("preview"))
-            {
-                await EventGrid.SendReferenceEvent(input.Codename, Events.ReferencePreview, input.IsTest);
-            }
-            else
-            {
-                await EventGrid.SendReferenceEvent(input.Codename, Events.ReferenceInitialize, input.IsTest);
-            }
+            var eventType = input.IsPreview == "true"
+                ? Events.ReferencePreview
+                : Events.ReferenceInitialize;
+
+            await EventGrid.SendReferenceEvent(input.Codename, eventType, input.IsTest);
         }
     }
 }

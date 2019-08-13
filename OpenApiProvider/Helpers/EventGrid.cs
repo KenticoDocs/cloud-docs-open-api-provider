@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
+using OpenApiProvider.Models;
 
 namespace OpenApiProvider.Helpers
 {
@@ -21,21 +22,27 @@ namespace OpenApiProvider.Helpers
 
         internal static async Task SendReferenceEvent(string apiReference, string eventType, string isTest = "disabled")
         {
-            var events = new List<EventGridEvent> {CreateEventGridEvent(apiReference, eventType, isTest) };
+            var events = new List<EventGridEvent>
+            {
+                CreateEventGridEvent(new EventGridData
+                    {
+                        ApiReference = apiReference,
+                        IsTest = isTest
+                    },
+                    eventType
+                )
+            };
 
             await _client.PublishEventsAsync(_topicHostname, events);
         }
 
-        private static EventGridEvent CreateEventGridEvent(string apiReference, string eventType, string isTest)
+        private static EventGridEvent CreateEventGridEvent(EventGridData eventGridData, string eventType)
             => new EventGridEvent
             {
                 Id = Guid.NewGuid().ToString(),
+                Subject = "event",
                 EventType = eventType,
-                Data = new
-                {
-                    apiReference,
-                    isTest
-                },
+                Data = eventGridData,
                 EventTime = DateTime.Now,
                 DataVersion = "1.0"
             };

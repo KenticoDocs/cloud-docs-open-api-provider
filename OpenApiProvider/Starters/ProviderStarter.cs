@@ -7,12 +7,13 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using OpenApiProvider.Constants;
+using OpenApiProvider.Models;
 
 namespace OpenApiProvider.Starters
 {
     public static class ProviderStarter
     {
-        private const int WaitForCompletionTime = 220;
+        private const int WaitForCompletionTime = 230;
 
         [FunctionName(Functions.ProviderStarter)]
         public static async Task<HttpResponseMessage> HttpStart(
@@ -21,18 +22,27 @@ namespace OpenApiProvider.Starters
             [OrchestrationClient] DurableOrchestrationClient starter,
             ILogger log)
         {
-            var apiReference = HttpUtility
-                .ParseQueryString(req.RequestUri.Query)
-                .Get("api");
-            var isTest = HttpUtility
-                .ParseQueryString(req.RequestUri.Query)
-                .Get("isTest");
+            var apiReference = ExtractQueryParameter(req, "api");
+            var isPreview = ExtractQueryParameter(req, "isPreview");
+            var isTest = ExtractQueryParameter(req, "isTest");
 
-            if (apiReference.Contains("preview"))
+            if (isPreview == "true")
             {
-                return await starter.RunOrchestrator(req, apiReference, isTest);
+                var response = await starter.RunOrchestrator(
+                    req,
+                    apiReference,
+                    new PreprocessorActivityInput
+                    {
+                        IsPreview = isPreview,
+                        IsTest = isTest,
+                        Codename = apiReference
+                    }
+                );
+
+                return response;
             }
 
+            await starter.PurgeInstanceHistoryAsync(apiReference);
             var orchestratorInstance = await starter.GetStatusAsync(apiReference);
 
             switch (orchestratorInstance?.RuntimeStatus)
@@ -52,34 +62,47 @@ namespace OpenApiProvider.Starters
                     };
 
                 default:
-                    return await starter.RunOrchestrator(req, apiReference, isTest);
+                    return await starter.RunOrchestrator(
+                        req,
+                        apiReference,
+                        new PreprocessorActivityInput {IsPreview = isPreview, IsTest = isTest, Codename = apiReference}
+                    );
             }
         }
+
+        private static string ExtractQueryParameter(HttpRequestMessage req, string parameterName) =>
+            HttpUtility
+                .ParseQueryString(req.RequestUri.Query)
+                .Get(parameterName);
 
         private static async Task<HttpResponseMessage> RunOrchestrator(
             this DurableOrchestrationClientBase starter,
             HttpRequestMessage req,
             string apiReference,
-            string isTest
+            PreprocessorActivityInput orchestratorInput
         )
         {
+            var orchestratorId = orchestratorInput.IsPreview == "true"
+                ? apiReference + "-preview"
+                : apiReference;
+
             await starter.StartNewAsync(
                 Functions.Orchestrator,
-                apiReference,
-                isTest
+                orchestratorId,
+                orchestratorInput
             );
 
-            return await starter.WaitAndGetOrchestratorResult(req, apiReference);
+            return await starter.WaitAndGetOrchestratorResult(req, orchestratorId);
         }
 
         private static async Task<HttpResponseMessage> WaitAndGetOrchestratorResult(
             this DurableOrchestrationClientBase client,
             HttpRequestMessage request,
-            string apiReference
-        ) =>
-            await client.WaitForCompletionOrCreateCheckStatusResponseAsync(
+            string orchestratorId
+        )
+            => await client.WaitForCompletionOrCreateCheckStatusResponseAsync(
                 request,
-                apiReference,
+                orchestratorId,
                 TimeSpan.FromSeconds(WaitForCompletionTime)
             );
     }
