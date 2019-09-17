@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +43,7 @@ namespace OpenApiProvider.Starters
                 return response;
             }
 
+            // TODO - check if this line should be deleted
             await starter.PurgeInstanceHistoryAsync(apiReference);
             var orchestratorInstance = await starter.GetStatusAsync(apiReference);
 
@@ -52,6 +54,7 @@ namespace OpenApiProvider.Starters
                     return await starter.WaitAndGetOrchestratorResult(req, apiReference);
 
                 case OrchestrationRuntimeStatus.Completed:
+                    // TODO - fix this returned message
                     return new HttpResponseMessage
                     {
                         Content = new StringContent(
@@ -77,14 +80,14 @@ namespace OpenApiProvider.Starters
 
         private static async Task<HttpResponseMessage> RunOrchestrator(
             this DurableOrchestrationClientBase starter,
-            HttpRequestMessage req,
+            HttpRequestMessage request,
             string apiReference,
             PreprocessorActivityInput orchestratorInput
         )
         {
-            var orchestratorId = orchestratorInput.IsPreview == "true"
+            var orchestratorId = (orchestratorInput.IsPreview == "true"
                 ? apiReference + "-preview"
-                : apiReference;
+                : apiReference) + ".html";
 
             await starter.StartNewAsync(
                 Functions.Orchestrator,
@@ -92,7 +95,7 @@ namespace OpenApiProvider.Starters
                 orchestratorInput
             );
 
-            return await starter.WaitAndGetOrchestratorResult(req, orchestratorId);
+            return await starter.WaitAndGetOrchestratorResult(request, orchestratorId);
         }
 
         private static async Task<HttpResponseMessage> WaitAndGetOrchestratorResult(
@@ -100,10 +103,20 @@ namespace OpenApiProvider.Starters
             HttpRequestMessage request,
             string orchestratorId
         )
-            => await client.WaitForCompletionOrCreateCheckStatusResponseAsync(
+        {
+            var orchestratorResponse = await client.WaitForCompletionOrCreateCheckStatusResponseAsync(
                 request,
                 orchestratorId,
                 TimeSpan.FromSeconds(WaitForCompletionTime)
             );
+
+            var responseContent = await orchestratorResponse.Content.ReadAsAsync<string>();
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(responseContent, Encoding.UTF8, "text/html")
+            };
+
+            return response;
+        }
     }
 }
