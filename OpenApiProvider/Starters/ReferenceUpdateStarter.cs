@@ -18,7 +18,9 @@ namespace OpenApiProvider.Starters
             ILogger log)
         {
             var eventGridData = (dynamic) eventGridEvent.Data;
-            var apiReference = (string) eventGridData.webhook.items.ToString();
+            var apiReference = (string) eventGridData.apiReference;
+
+            await starter.PurgeInstanceHistoryAsync(apiReference);
 
             await starter.StartNewAsync(
                 Functions.Orchestrator,

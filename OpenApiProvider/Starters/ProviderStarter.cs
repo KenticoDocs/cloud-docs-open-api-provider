@@ -27,6 +27,11 @@ namespace OpenApiProvider.Starters
             var isPreview = ExtractQueryParameter(req, "isPreview");
             var isTest = ExtractQueryParameter(req, "isTest");
 
+            if (apiReference == null)
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+
             if (isPreview == "true")
             {
                 var response = await starter.RunOrchestrator(
@@ -43,8 +48,6 @@ namespace OpenApiProvider.Starters
                 return response;
             }
 
-            // TODO - check if this line should be deleted
-            await starter.PurgeInstanceHistoryAsync(apiReference);
             var orchestratorInstance = await starter.GetStatusAsync(apiReference);
 
             switch (orchestratorInstance?.RuntimeStatus)
@@ -54,13 +57,12 @@ namespace OpenApiProvider.Starters
                     return await starter.WaitAndGetOrchestratorResult(req, apiReference);
 
                 case OrchestrationRuntimeStatus.Completed:
-                    // TODO - fix this returned message
                     return new HttpResponseMessage
                     {
                         Content = new StringContent(
                             orchestratorInstance.Output.ToString(),
                             Encoding.UTF8,
-                            "application/json"
+                            "text/html"
                         )
                     };
 
