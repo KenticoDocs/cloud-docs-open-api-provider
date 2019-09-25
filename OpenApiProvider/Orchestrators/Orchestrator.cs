@@ -12,15 +12,18 @@ namespace OpenApiProvider.Orchestrators
         {
             var orchestratorInput = context.GetInput<PreprocessorActivityInput>();
 
-            await context.CallActivityAsync(
-                Functions.TriggerPreprocessorActivity,
-                new PreprocessorActivityInput
-                {
-                    Codename = orchestratorInput.Codename,
-                    IsTest = orchestratorInput.IsTest,
-                    IsPreview = orchestratorInput.IsPreview
-                }
-            );
+            if (orchestratorInput != null)
+            {
+                await context.CallActivityAsync(
+                    Functions.TriggerPreprocessorActivity,
+                    new PreprocessorActivityInput
+                    {
+                        Codename = orchestratorInput.Codename,
+                        IsTest = orchestratorInput.IsTest,
+                        IsPreview = orchestratorInput.IsPreview
+                    }
+                );
+            }
 
             var blobUrl = await context.WaitForExternalEvent<string>(Events.BlobCreated);
 
