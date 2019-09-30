@@ -87,9 +87,9 @@ namespace OpenApiProvider.Starters
             PreprocessorActivityInput orchestratorInput
         )
         {
-            var orchestratorId = (orchestratorInput.IsPreview == "true"
+            var orchestratorId = orchestratorInput.IsPreview == "true"
                 ? apiReference + "-preview"
-                : apiReference) + ".html";
+                : apiReference;
 
             await starter.StartNewAsync(
                 Functions.Orchestrator,
