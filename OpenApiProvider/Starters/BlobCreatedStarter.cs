@@ -20,7 +20,9 @@ namespace OpenApiProvider.Starters
             var blobUrl = (string)eventGridData.url;
             var instanceId = blobUrl
                 .Split("/")
-                .Last();
+                .Last()
+                .Split(".")
+                .First();
 
             await starter.RaiseEventAsync(instanceId, Events.BlobCreated, blobUrl);
         }
