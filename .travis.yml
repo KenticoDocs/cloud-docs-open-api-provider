@@ -1,0 +1,23 @@
+﻿language: csharp
+mono: none
+dotnet: 2.1.502
+jobs:
+  include:
+    - stage: "build"
+
+      script:
+        - dotnet build
+
+    - stage: "Deployment"
+      if: type != pull_request AND (branch = master OR branch = develop)
+
+      before_script: 
+        - chmod +rx .travis/deploy.sh
+
+      script: 
+        - .travis/deploy.sh
+
+cache:
+  directories:
+    - "$HOME/.nuget/packages"
+    - "$HOME/.local/share/NuGet/Cache"
