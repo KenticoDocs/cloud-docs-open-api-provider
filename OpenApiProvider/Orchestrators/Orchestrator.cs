@@ -8,7 +8,7 @@ namespace OpenApiProvider.Orchestrators
     public static class Orchestrator
     {
         [FunctionName(Functions.Orchestrator)]
-        public static async Task<string> RunOrchestrator([OrchestrationTrigger] DurableOrchestrationContext context)
+        public static async Task<string> RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var orchestratorInput = context.GetInput<PreprocessorActivityInput>();
 

@@ -14,7 +14,7 @@ namespace OpenApiProvider.Starters
         [FunctionName(Functions.ReferenceUpdateStarter)]
         public static async Task HttpStart(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            [OrchestrationClient] DurableOrchestrationClient starter,
+            [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             var eventGridData = (dynamic) eventGridEvent.Data;

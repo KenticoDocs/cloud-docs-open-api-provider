@@ -13,7 +13,7 @@ namespace OpenApiProvider.Starters
         [FunctionName(Functions.BlobCreatedStarter)]
         public static async Task EventGridStart(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            [OrchestrationClient] DurableOrchestrationClient starter,
+            [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             var eventGridData = (dynamic) eventGridEvent.Data;
