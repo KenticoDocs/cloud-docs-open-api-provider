@@ -6,5 +6,6 @@
         internal const string ReferenceUpdated = "UPDATE";
         internal const string ReferenceInitialize = "INITIALIZE";
         internal const string ReferencePreview = "PREVIEW";
+        internal const string ReferenceDelete = "DELETE";
     }
 }
