@@ -4,7 +4,9 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
+using OpenApiProvider.Configuration;
 using OpenApiProvider.Constants;
+using OpenApiProvider.Helpers;
 
 namespace OpenApiProvider.Starters
 {
@@ -25,6 +27,16 @@ namespace OpenApiProvider.Starters
                 .First();
 
             await starter.RaiseEventAsync(instanceId, Events.BlobCreated, blobUrl);
+
+            if (!blobUrl.Contains("preview"))
+            {
+                EventGrid.SetupEventGrid(
+                    EnvironmentVariables.EventGridReferenceUpdatedEndpoint,
+                    EnvironmentVariables.EventGridReferenceUpdatedKey
+                );
+
+                await EventGrid.SendReferenceEvent(instanceId, Events.ReferenceUpdated);
+            }
         }
     }
 }
