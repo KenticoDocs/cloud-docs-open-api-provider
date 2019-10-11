@@ -14,13 +14,13 @@ namespace OpenApiProvider.Starters
 {
     public static class ProviderStarter
     {
-        private const int WaitForCompletionTime = 230;
+        private const int WaitForCompletionTime = 210;
 
         [FunctionName(Functions.ProviderStarter)]
         public static async Task<HttpResponseMessage> HttpStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]
             HttpRequestMessage req,
-            [OrchestrationClient] DurableOrchestrationClient starter,
+            [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             var apiReference = ExtractQueryParameter(req, "api");
@@ -81,7 +81,7 @@ namespace OpenApiProvider.Starters
                 .Get(parameterName);
 
         private static async Task<HttpResponseMessage> RunOrchestrator(
-            this DurableOrchestrationClientBase starter,
+            this IDurableOrchestrationClient starter,
             HttpRequestMessage request,
             string apiReference,
             PreprocessorActivityInput orchestratorInput
@@ -101,7 +101,7 @@ namespace OpenApiProvider.Starters
         }
 
         private static async Task<HttpResponseMessage> WaitAndGetOrchestratorResult(
-            this DurableOrchestrationClientBase client,
+            this IDurableOrchestrationClient client,
             HttpRequestMessage request,
             string orchestratorId
         )
@@ -112,6 +112,15 @@ namespace OpenApiProvider.Starters
                 TimeSpan.FromSeconds(WaitForCompletionTime)
             );
 
+            var orchestratorInstance = await client.GetStatusAsync(orchestratorId);
+
+            if (orchestratorInstance.RuntimeStatus != OrchestrationRuntimeStatus.Completed)
+            {
+                await client.PurgeInstanceHistoryAsync(orchestratorId);
+
+                return GetTimeoutErrorMessage();
+            }
+
             var responseContent = await orchestratorResponse.Content.ReadAsAsync<string>();
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -120,5 +129,15 @@ namespace OpenApiProvider.Starters
 
             return response;
         }
+
+        private static HttpResponseMessage GetTimeoutErrorMessage() =>
+            new HttpResponseMessage(HttpStatusCode.InternalServerError)
+            {
+                Content = new StringContent(
+                    "API reference generation timed out.",
+                    Encoding.UTF8,
+                    "text/html"
+                )
+            };
     }
 }

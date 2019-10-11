@@ -3,9 +3,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
-using OpenApiProvider.Configuration;
 using OpenApiProvider.Constants;
-using OpenApiProvider.Helpers;
 
 namespace OpenApiProvider.Starters
 {
@@ -14,7 +12,7 @@ namespace OpenApiProvider.Starters
         [FunctionName(Functions.ReferenceUpdateStarter)]
         public static async Task HttpStart(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            [OrchestrationClient] DurableOrchestrationClient starter,
+            [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             var eventGridData = (dynamic) eventGridEvent.Data;
@@ -27,13 +25,6 @@ namespace OpenApiProvider.Starters
                 apiReference,
                 null
             );
-
-            EventGrid.SetupEventGrid(
-                EnvironmentVariables.EventGridReferenceUpdatedEndpoint,
-                EnvironmentVariables.EventGridReferenceUpdatedKey
-            );
-
-            await EventGrid.SendReferenceEvent(apiReference, Events.ReferenceUpdated);
         }
     }
 }
