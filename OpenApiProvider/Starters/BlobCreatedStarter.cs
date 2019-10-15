@@ -19,7 +19,7 @@ namespace OpenApiProvider.Starters
             ILogger log)
         {
             var eventGridData = (dynamic) eventGridEvent.Data;
-            var blobUrl = (string)eventGridData.url;
+            var blobUrl = (string) eventGridData.url;
             var instanceId = blobUrl
                 .Split("/")
                 .Last()
