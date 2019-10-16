@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
@@ -12,13 +14,15 @@ namespace OpenApiProvider.Starters
 {
     public static class BlobCreatedStarter
     {
+        public const short NumberOfRetries = 3;
+
         [FunctionName(Functions.BlobCreatedStarter)]
         public static async Task EventGridStart(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            [DurableClient] IDurableOrchestrationClient starter,
+            [OrchestrationClient] DurableOrchestrationClient starter,
             ILogger log)
         {
-            var eventGridData = (dynamic) eventGridEvent.Data;
+            var eventGridData = (dynamic)eventGridEvent.Data;
             var blobUrl = (string)eventGridData.url;
             var instanceId = blobUrl
                 .Split("/")
@@ -26,7 +30,7 @@ namespace OpenApiProvider.Starters
                 .Split(".")
                 .First();
 
-            await starter.RaiseEventAsync(instanceId, Events.BlobCreated, blobUrl);
+            await starter.RaiseEventWithRetryAsync(instanceId, blobUrl);
 
             if (!blobUrl.Contains("preview"))
             {
@@ -36,6 +40,28 @@ namespace OpenApiProvider.Starters
                 );
 
                 await EventGrid.SendReferenceEvent(instanceId, Events.ReferenceUpdated);
+            }
+        }
+
+        private static async Task RaiseEventWithRetryAsync(this DurableOrchestrationClient starter, string instanceId, string blobUrl)
+        {
+            for (var i = 1; i <= NumberOfRetries; i++)
+            {
+                try
+                {
+                    await starter.RaiseEventAsync(instanceId, Events.BlobCreated, blobUrl);
+
+                    return;
+                }
+                catch (InvalidOperationException)
+                {
+                    if (i == NumberOfRetries)
+                    {
+                        throw;
+                    }
+
+                    Thread.Sleep(1000 * i * i);
+                }
             }
         }
     }
