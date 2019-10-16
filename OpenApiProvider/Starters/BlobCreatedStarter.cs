@@ -19,7 +19,7 @@ namespace OpenApiProvider.Starters
         [FunctionName(Functions.BlobCreatedStarter)]
         public static async Task EventGridStart(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            [DurableClient] IDurableOrchestrationClient starter,
+            [OrchestrationClient] DurableOrchestrationClient starter,
             ILogger log)
         {
             var eventGridData = (dynamic)eventGridEvent.Data;
@@ -43,7 +43,7 @@ namespace OpenApiProvider.Starters
             }
         }
 
-        private static async Task RaiseEventWithRetryAsync(this IDurableOrchestrationClient starter, string instanceId, string blobUrl)
+        private static async Task RaiseEventWithRetryAsync(this DurableOrchestrationClient starter, string instanceId, string blobUrl)
         {
             for (var i = 1; i <= NumberOfRetries; i++)
             {

@@ -20,7 +20,7 @@ namespace OpenApiProvider.Starters
         public static async Task<HttpResponseMessage> HttpStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]
             HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
+            [OrchestrationClient] DurableOrchestrationClient starter,
             ILogger log)
         {
             var apiReference = ExtractQueryParameter(req, "api");
@@ -81,7 +81,7 @@ namespace OpenApiProvider.Starters
                 .Get(parameterName);
 
         private static async Task<HttpResponseMessage> RunOrchestrator(
-            this IDurableOrchestrationClient starter,
+            this DurableOrchestrationClientBase starter,
             HttpRequestMessage request,
             string apiReference,
             PreprocessorActivityInput orchestratorInput
@@ -101,7 +101,7 @@ namespace OpenApiProvider.Starters
         }
 
         private static async Task<HttpResponseMessage> WaitAndGetOrchestratorResult(
-            this IDurableOrchestrationClient client,
+            this DurableOrchestrationClientBase client,
             HttpRequestMessage request,
             string orchestratorId
         )
