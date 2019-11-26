@@ -11,6 +11,7 @@ namespace OpenApiProvider.Orchestrators
         public static async Task<string> RunOrchestrator([OrchestrationTrigger] DurableOrchestrationContext context)
         {
             var orchestratorInput = context.GetInput<PreprocessorActivityInput>();
+            var blobUrl = await context.WaitForExternalEvent<string>(Events.BlobCreated);
 
             if (orchestratorInput != null)
             {
@@ -24,8 +25,6 @@ namespace OpenApiProvider.Orchestrators
                     }
                 );
             }
-
-            var blobUrl = await context.WaitForExternalEvent<string>(Events.BlobCreated);
 
             var blobContent = await context.CallActivityAsync<string>(
                 Functions.GetBlobFromStorageActivity,
