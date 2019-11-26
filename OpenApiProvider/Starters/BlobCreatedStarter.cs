@@ -14,7 +14,7 @@ namespace OpenApiProvider.Starters
 {
     public static class BlobCreatedStarter
     {
-        public const short NumberOfRetries = 3;
+        public const short NumberOfRetries = 100;
 
         [FunctionName(Functions.BlobCreatedStarter)]
         public static async Task EventGridStart(
@@ -60,7 +60,7 @@ namespace OpenApiProvider.Starters
                         throw;
                     }
 
-                    Thread.Sleep(1000 * i * i);
+                    Thread.Sleep(1000);
                 }
             }
         }
