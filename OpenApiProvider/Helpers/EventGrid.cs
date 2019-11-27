@@ -9,10 +9,10 @@ namespace OpenApiProvider.Helpers
 {
     internal class EventGrid
     {
-        private static string _topicHostname;
-        private static EventGridClient _client;
+        private readonly string _topicHostname;
+        private readonly EventGridClient _client;
 
-        internal static void SetupEventGrid(string topicEndpoint, string topicKey)
+        internal EventGrid(string topicEndpoint, string topicKey)
         {
             var topicCredentials = new TopicCredentials(topicKey);
 
@@ -20,7 +20,7 @@ namespace OpenApiProvider.Helpers
             _client = new EventGridClient(topicCredentials);
         }
 
-        internal static async Task SendReferenceEvent(string apiReference, string eventType, string isTest = "disabled")
+        internal async Task SendReferenceEvent(string apiReference, string eventType, string isTest = "disabled")
         {
             var events = new List<EventGridEvent>
             {
@@ -36,7 +36,7 @@ namespace OpenApiProvider.Helpers
             await _client.PublishEventsAsync(_topicHostname, events);
         }
 
-        private static EventGridEvent CreateEventGridEvent(EventGridData eventGridData, string eventType)
+        private EventGridEvent CreateEventGridEvent(EventGridData eventGridData, string eventType)
             => new EventGridEvent
             {
                 Id = Guid.NewGuid().ToString(),

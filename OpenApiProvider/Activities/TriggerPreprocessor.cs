@@ -13,16 +13,16 @@ namespace OpenApiProvider.Activities
         [FunctionName(Functions.TriggerPreprocessorActivity)]
         public static async Task Trigger([ActivityTrigger] PreprocessorActivityInput input, ILogger log)
         {
-            EventGrid.SetupEventGrid(
+            var eventGrid = new EventGrid(
                 EnvironmentVariables.EventGridReferenceRequestedEndpoint,
                 EnvironmentVariables.EventGridReferenceRequestedKey
-            );
+                );
 
             var eventType = input.IsPreview == "true"
                 ? Events.ReferencePreview
                 : Events.ReferenceInitialize;
 
-            await EventGrid.SendReferenceEvent(input.Codename, eventType, input.IsTest);
+            await eventGrid.SendReferenceEvent(input.Codename, eventType, input.IsTest);
         }
     }
 }

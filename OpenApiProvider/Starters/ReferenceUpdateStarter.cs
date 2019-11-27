@@ -25,12 +25,11 @@ namespace OpenApiProvider.Starters
 
             if (operation == Events.ReferenceDelete)
             {
-                EventGrid.SetupEventGrid(
+                var eventGrid = new EventGrid(
                     EnvironmentVariables.EventGridReferenceUpdatedEndpoint,
-                    EnvironmentVariables.EventGridReferenceUpdatedKey
-                );
+                    EnvironmentVariables.EventGridReferenceUpdatedKey);
 
-                await EventGrid.SendReferenceEvent(apiReference, Events.ReferenceDelete);
+                await eventGrid.SendReferenceEvent(apiReference, Events.ReferenceDelete);
             }
             else
             {
