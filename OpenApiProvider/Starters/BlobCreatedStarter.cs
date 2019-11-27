@@ -34,12 +34,12 @@ namespace OpenApiProvider.Starters
 
             if (!blobUrl.Contains("preview"))
             {
-                EventGrid.SetupEventGrid(
-                    EnvironmentVariables.EventGridReferenceUpdatedEndpoint,
-                    EnvironmentVariables.EventGridReferenceUpdatedKey
-                );
 
-                await EventGrid.SendReferenceEvent(instanceId, Events.ReferenceUpdated);
+                var eventGrid = new EventGrid(
+                    EnvironmentVariables.EventGridReferenceUpdatedEndpoint,
+                    EnvironmentVariables.EventGridReferenceUpdatedKey);
+
+                await eventGrid.SendReferenceEvent(instanceId, Events.ReferenceUpdated);
             }
         }
 
