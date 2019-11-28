@@ -12,7 +12,7 @@ namespace OpenApiProvider.Orchestrators
         public static async Task<string> RunOrchestrator([OrchestrationTrigger] DurableOrchestrationContext context, ILogger logger)
         {
             var orchestratorInput = context.GetInput<PreprocessorActivityInput>();
-            logger.Log(LogLevel.Information, $"Running orchestrator. Input: {(orchestratorInput == null ? "set" : "unset")}. Instance id: {context.InstanceId}");
+            logger.Log(LogLevel.Trace, $"Running orchestrator. Input: {(orchestratorInput == null ? "set" : "unset")}. Instance id: {context.InstanceId}");
 
             if (orchestratorInput != null)
             {
@@ -27,9 +27,9 @@ namespace OpenApiProvider.Orchestrators
                 );
             }
 
-            logger.Log(LogLevel.Information, $"Orchestrator waiting. Input: {(orchestratorInput == null ? "set" : "unset")}. Instance id: {context.InstanceId}");
+            logger.Log(LogLevel.Trace, $"Orchestrator waiting. Input: {(orchestratorInput == null ? "set" : "unset")}. Instance id: {context.InstanceId}");
             var blobUrl = await context.WaitForExternalEvent<string>(Events.BlobCreated);
-            logger.Log(LogLevel.Information, $"Orchestrator got blob");
+            logger.Log(LogLevel.Trace, $"Orchestrator got blob");
 
             var blobContent = await context.CallActivityAsync<string>(
                 Functions.GetBlobFromStorageActivity,
