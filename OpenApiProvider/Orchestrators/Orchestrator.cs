@@ -10,7 +10,6 @@ namespace OpenApiProvider.Orchestrators
         [FunctionName(Functions.Orchestrator)]
         public static async Task<string> RunOrchestrator([OrchestrationTrigger] DurableOrchestrationContext context)
         {
-            /*
             var orchestratorInput = context.GetInput<PreprocessorActivityInput>();
             if (orchestratorInput != null)
             {
@@ -25,7 +24,6 @@ namespace OpenApiProvider.Orchestrators
             );
             }
 
-            /*
             var blobUrl = await context.WaitForExternalEvent<string>(Events.BlobCreated);
 
             var blobContent = await context.CallActivityAsync<string>(
@@ -34,9 +32,6 @@ namespace OpenApiProvider.Orchestrators
             );
 
             return blobContent;
-            */
-
-            return $"testValFor: {context.InstanceId}";
         }
     }
 }
