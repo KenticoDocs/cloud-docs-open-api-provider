@@ -67,7 +67,6 @@ namespace OpenApiProvider.Starters
                     };
 
                 default:
-                    log.Log(LogLevel.Trace, $"Starting new orchestration. Status: {orchestratorInstance?.RuntimeStatus}. Id: {orchestratorInstance?.InstanceId}. Name: {orchestratorInstance?.Name}");
                     return await starter.RunOrchestrator(
                         req,
                         apiReference,
