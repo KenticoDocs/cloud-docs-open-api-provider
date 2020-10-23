@@ -14,7 +14,7 @@ namespace OpenApiProvider.Starters
 {
     public static class ProviderStarter
     {
-        private const int WaitForCompletionTime = 210;
+        private const int WaitForCompletionTime = 360;
 
         [FunctionName(Functions.ProviderStarter)]
         public static async Task<HttpResponseMessage> HttpStart(
