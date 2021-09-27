@@ -36,6 +36,6 @@ jobs:
       with:
         app-name: 'kcd-open-api-provider-live-dev'
         slot-name: 'production'
-        package: ${{ github.action_path + '/output' }}
+        package: '${{ github.action_path }}/output'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_13cf418e996a44c5a590c7bc8b39d967 }}
   
