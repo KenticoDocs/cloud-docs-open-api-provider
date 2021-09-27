@@ -1,0 +1,13 @@
+{
+  "generatedBy": "Microsoft.NET.Sdk.Functions-1.0.29",
+  "configurationSource": "attributes",
+  "bindings": [
+    {
+      "type": "activityTrigger",
+      "name": "blobUrl"
+    }
+  ],
+  "disabled": false,
+  "scriptFile": "../bin/OpenApiProvider.dll",
+  "entryPoint": "OpenApiProvider.Activities.GetBlobFromStorage.GetBlob"
+}
