@@ -1,6 +1,5 @@
-| [master](https://github.com/KenticoDocs/kontent-docs-blob-provider/tree/master) | [develop](https://github.com/KenticoDocs/kontent-docs-blob-provider/tree/develop) |
-|:---:|:---:|
-| [![Build Status](https://travis-ci.com/KenticoDocs/kontent-docs-blob-provider.svg?branch=master)](https://travis-ci.com/KenticoDocs/kontent-docs-blob-provider) | [![Build Status](https://travis-ci.com/KenticoDocs/kontent-docs-blob-provider.svg?branch=develop)](https://travis-ci.com/KenticoDocs/kontent-docs-blob-provider) |
+![master](https://github.com/KenticoDocs/kontent-docs-blob-provider/actions/workflows/master_kcd-open-api-provider-live-master.yml/badge.svg)
+![develop](https://github.com/KenticoDocs/kontent-docs-blob-provider/actions/workflows/develop_kcd-open-api-provider-live-dev.yml/badge.svg)
 
 # Kentico Kontent Documentation - OpenAPI provider
 
